@@ -4,13 +4,14 @@ services:
     env: python
     region: frankfurt
     plan: free
+    pythonVersion: "3.12.0"
     buildCommand: "cd backend && pip install -r requirements.txt"
     startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     healthCheckPath: /api/health
     envVars:
       - key: PYTHON_VERSION
-        value: 3.12.0
+        value: "3.12.0"
       - key: DATABASE_URL
-        sync: false # Enter your Aiven PostgreSQL URL in the Render Environment settings
+        sync: false
       - key: CORS_ORIGINS
         value: "*"
