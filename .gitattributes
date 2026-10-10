@@ -1,0 +1,12 @@
+# Ensure consistent line endings across platforms
+* text=auto eol=lf
+
+# Force binary for these file types
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.exe binary
+*.db binary
+*.sqlite binary

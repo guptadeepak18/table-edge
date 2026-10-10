@@ -1,0 +1,50 @@
+# ─── Secrets & Environment ────────────────────────────────────────────────────
+.env
+*.env
+.env.*
+backend/.env
+
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+backend/.venv/
+.venv/
+env/
+venv/
+ENV/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# ─── Databases ────────────────────────────────────────────────────────────────
+*.db
+*.sqlite3
+backend/roulette.db
+backend/table_edge.db
+
+# ─── Node / Frontend ──────────────────────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+dist/
+
+# ─── OS & Editor ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/settings.json
+
+# ─── Cloudflare tunnel binary ─────────────────────────────────────────────────
+cloudflared.exe
+
+# ─── Backups ──────────────────────────────────────────────────────────────────
+backups/
+
+# ─── uv lock (optional - keep if you want reproducible installs) ──────────────
+# backend/uv.lock
