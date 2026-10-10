@@ -659,7 +659,7 @@ export const WorkflowPipeline: React.FC<WorkflowPipelineProps> = ({
   // Fetch dynamic community options from database on mount
   useEffect(() => {
     let isMounted = true;
-    fetch('http://127.0.0.1:8000/api/simulator/conditions/options')
+    fetch('/api/simulator/conditions/options')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!isMounted || !data) return;

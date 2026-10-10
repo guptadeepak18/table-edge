@@ -25,7 +25,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
 
   const fetchTiers = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/admin/tiers');
+      const res = await fetch('/api/admin/tiers');
       if (res.ok) {
         const data = await res.json();
         setTiers(data);
@@ -41,7 +41,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
 
   const fetchAuditLogs = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/admin/audit-logs');
+      const res = await fetch('/api/admin/audit-logs');
       if (res.ok) {
         const data = await res.json();
         setAuditLogs(data);
@@ -72,7 +72,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
 
   const handleSaveConfig = async (key: string, value: any) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/admin/tiers/${selectedTier}/config`, {
+      const res = await fetch(`/api/admin/tiers/${selectedTier}/config`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

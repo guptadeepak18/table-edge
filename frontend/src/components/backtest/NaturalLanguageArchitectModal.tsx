@@ -84,7 +84,7 @@ export const NaturalLanguageArchitectModal: React.FC<NaturalLanguageArchitectMod
     setSuccessInfo(null);
 
     try {
-      const resp = await fetch('http://127.0.0.1:8000/api/simulator/strategy/parse-natural-language', {
+      const resp = await fetch('/api/simulator/strategy/parse-natural-language', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,7 +1,10 @@
+import os
 import uuid
 from datetime import datetime, timezone
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, JSONResponse
 from contextlib import asynccontextmanager
 from sqlalchemy import select, text
 from app.core.config import settings
@@ -280,10 +283,36 @@ app.include_router(tracker_router, prefix=settings.API_V1_STR)
 app.include_router(strategies_router, prefix=settings.API_V1_STR)
 app.include_router(admin_router, prefix=settings.API_V1_STR)
 
-@app.get("/")
-async def root():
-    return {"status": "ok", "app": settings.PROJECT_NAME, "version": "1.0.0"}
-
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
+
+# ─── Frontend SPA Static Serving ─────────────────────────────────────────────
+backend_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+frontend_candidates = [
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "static"),
+    os.path.join(backend_root, "frontend", "dist"),
+]
+
+frontend_dist = next(
+    (p for p in frontend_candidates if os.path.isdir(p) and os.path.isfile(os.path.join(p, "index.html"))),
+    None
+)
+
+if frontend_dist:
+    assets_dir = os.path.join(frontend_dist, "assets")
+    if os.path.isdir(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        if full_path.startswith("api/"):
+            return JSONResponse(status_code=404, content={"detail": "Not Found"})
+        file_path = os.path.join(frontend_dist, full_path)
+        if full_path and os.path.isfile(file_path):
+            return FileResponse(file_path)
+        return FileResponse(os.path.join(frontend_dist, "index.html"))
+else:
+    @app.get("/")
+    async def root():
+        return {"status": "ok", "app": settings.PROJECT_NAME, "version": "1.0.0"}
