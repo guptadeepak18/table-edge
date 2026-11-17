@@ -215,8 +215,9 @@ async def lifespan(app: FastAPI):
             
             # Initial multi-casino operator pool
             initial_casinos = [
-                ("ppcwm00000006838", "Pragmatic Play Live (Primary - 44+ tables)", True),
-                ("ppcdk00000003716", "Pragmatic Play Live (Secondary - Legacy)", False),
+                ("ppcds00000003709", "Stake.com Live (Exclusive - Gates of Olympus & Stake Roulette)", True),
+                ("ppcwm00000006838", "Pragmatic Play Live (Broad - 44+ tables)", False),
+                ("ppcdk00000003716", "Pragmatic Play Live (Legacy Fallback)", False),
             ]
             
             for cid, cname, is_def in initial_casinos:

@@ -63,6 +63,7 @@ PRAGMATIC_ROULETTE_NAMES: Dict[str, str] = {
     "248": "Prive Lounge Roulette 5",
     "249": "Lucky 6 Roulette",
     "250": "Auto Mega Roulette",
+    "2244": "Gates of Olympus Roulette",
 }
 
 DEALER_SHIFT_ROSTER: Dict[str, List[str]] = {
@@ -157,6 +158,7 @@ DEFAULT_INITIAL_TABLES: List[Dict[str, Any]] = [
     _make_table_item("248", "Prive Lounge Roulette 5", "Seraphina Laurent", "d-248", [16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26]),
     _make_table_item("249", "Lucky 6 Roulette", "Gabriel Costa", "d-249", [9, 22, 18, 29, 7, 28, 12, 35, 3, 26, 0, 32, 15, 19, 4, 21]),
     _make_table_item("250", "Auto Mega Roulette", "Mega Auto Sensor", "d-250", [7, 28, 12, 35, 3, 26, 0, 32, 15, 19, 4, 21, 2, 25, 17, 34]),
+    _make_table_item("2244", "Gates of Olympus Roulette", "Ty", "d-2244", [15, 28, 9, 26, 0, 32, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13]),
 ]
 
 class PragmaticFeedService:
