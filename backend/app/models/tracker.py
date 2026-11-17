@@ -66,5 +66,7 @@ class TableDealerSpinHistory(Base):
     direction = Column(String(10), default="cw")
     segment_index = Column(Integer, nullable=False)  # 1-6
     offset_from_previous = Column(Integer, nullable=True)
+    casino_provider = Column(String(50), nullable=True, index=True)
+    casino_id = Column(String(100), nullable=True, index=True)
     spun_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True)
 

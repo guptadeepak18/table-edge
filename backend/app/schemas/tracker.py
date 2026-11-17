@@ -53,6 +53,7 @@ class HistoricalArchiveStats(BaseModel):
     total_spins: int
     dealers: List[Dict[str, Any]] = []
     tables: List[Dict[str, Any]] = []
+    providers: List[Dict[str, Any]] = []
 
 class LiveSessionCreate(BaseModel):
     rules: GameRules = "EUR"

@@ -1,0 +1,554 @@
+{
+  "provider_counts": {
+    "Stake": 46,
+    "Shuffle": 45,
+    "Pragmatic Direct (Legacy)": 0
+  },
+  "total_unique_tables": 49,
+  "by_type": {
+    "BACCARAT": [
+      {
+        "id": "401",
+        "name": "Baccarat 1",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Nancie",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "402",
+        "name": "Speed Baccarat 1",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Adonia",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "403",
+        "name": "Speed Baccarat 2",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Melania",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "404",
+        "name": "Baccarat 2",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Hazel",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "405",
+        "name": "Speed Baccarat 18",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Alica",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "411",
+        "name": "Baccarat 5",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Charly",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "412",
+        "name": "Speed Baccarat 3",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Anthea",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "413",
+        "name": "Baccarat 6",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Cherry-Faith",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "414",
+        "name": "Speed Baccarat 5",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Audrey-Lisa",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "415",
+        "name": "Speed Baccarat 6",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Clarabelle",
+        "status": "Live",
+        "spins_captured": 0
+      }
+    ],
+    "BLACKJACK": [
+      {
+        "id": "301",
+        "name": "Blackjack 11",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Gerald-Ross",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "302",
+        "name": "Blackjack 12",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Chester-Miguel",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "303",
+        "name": "Blackjack 14",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Stephan",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "304",
+        "name": "Blackjack 15",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Dwight-Bill",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "305",
+        "name": "Blackjack 16",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Benjamin-Jesse",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "321",
+        "name": "Turkish Speed Blackjack 1",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Mertcann",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "322",
+        "name": "Turkish Blackjack 1",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Ege",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "323",
+        "name": "Turkish VIP Blackjack 1",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Tuna",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "324",
+        "name": "Turkish VIP Blackjack 2",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Ilker",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "325",
+        "name": "Blackjack 112",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "No dealer",
+        "status": "Closed",
+        "spins_captured": 0
+      },
+      {
+        "id": "601",
+        "name": "Blackjack 60",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Alvin-Benjamin",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "602",
+        "name": "Blackjack 61",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Milton-Preston",
+        "status": "Live",
+        "spins_captured": 0
+      },
+      {
+        "id": "603",
+        "name": "Blackjack 62",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Armando-Jeffrey",
+        "status": "Live",
+        "spins_captured": 0
+      }
+    ],
+    "MEGAWHEEL": [
+      {
+        "id": "801",
+        "name": "Mega Wheel",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Kraig",
+        "status": "Live",
+        "spins_captured": 20
+      }
+    ],
+    "ONEBJ": [
+      {
+        "id": "901",
+        "name": "ONE Blackjack 1",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Callaway",
+        "status": "Live",
+        "spins_captured": 0
+      }
+    ],
+    "ROULETTE": [
+      {
+        "id": "201",
+        "name": "Roulette 2 Extra Time",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Tim-Mason",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "203",
+        "name": "Speed Roulette 1",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Cassen",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "204",
+        "name": "Mega Roulette",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Keisha",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "206",
+        "name": "Roulette Macao",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Cortana",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "208",
+        "name": "Turkish Mega Roulette",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Bahar",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "210",
+        "name": "Auto Mega Roulette",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Auto",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "221",
+        "name": "Russian Roulette",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Yermolai",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "222",
+        "name": "German Roulette",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Tonio",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "223",
+        "name": "Roulette Italia Tricolore",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Giovanni",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "224",
+        "name": "Turkish Roulette",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Ramazan",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "2244",
+        "name": "Gates Of Olympus Roulette",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Elleanor",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "225",
+        "name": "Auto Roulette",
+        "providers": [
+          "Stake"
+        ],
+        "dealer": "Auto",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "225a117",
+        "name": "Shuffle Auto Roulette",
+        "providers": [
+          "Shuffle"
+        ],
+        "dealer": "Auto",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "226",
+        "name": "Speed Auto Roulette",
+        "providers": [
+          "Stake"
+        ],
+        "dealer": "Auto",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "226a98",
+        "name": "Shuffle Speed Auto Roulette",
+        "providers": [
+          "Shuffle"
+        ],
+        "dealer": "Auto",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "227",
+        "name": "Roulette 1",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Ivona",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "230",
+        "name": "Roulette 3",
+        "providers": [
+          "Stake"
+        ],
+        "dealer": "Elvia",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "230a124",
+        "name": "Shuffle Roulette",
+        "providers": [
+          "Shuffle"
+        ],
+        "dealer": "Elvia",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "233",
+        "name": "Romanian Roulette",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Philip-Richard",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "234",
+        "name": "Roulette Latina",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Marina",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "236",
+        "name": "STAKE ROULETTE",
+        "providers": [
+          "Stake"
+        ],
+        "dealer": "Berkley",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "237",
+        "name": "Brazilian Roulette",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Maria-Julia",
+        "status": "Live",
+        "spins_captured": 20
+      },
+      {
+        "id": "240",
+        "name": "PowerUp Roulette",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Stacie",
+        "status": "Live",
+        "spins_captured": 20
+      }
+    ],
+    "SicBO": [
+      {
+        "id": "701",
+        "name": "Mega Sic Bo",
+        "providers": [
+          "Stake",
+          "Shuffle"
+        ],
+        "dealer": "Jace",
+        "status": "Live",
+        "spins_captured": 20
+      }
+    ]
+  }
+}

@@ -193,6 +193,13 @@ class PragmaticFeedService:
         self._ticker_task: Optional[asyncio.Task] = None
         self._ws = None
 
+        self.PROVIDER_NAMES: Dict[str, str] = {
+            "ppcds00000003709": "Stake",
+            "ppcwm00000006838": "Shuffle",
+            "ppcdk00000003716": "Pragmatic Direct",
+        }
+        self.table_provider_map: Dict[str, Dict[str, str]] = {}
+
         # State storage initialized with canonical Pragmatic roulette tables
         self.available_tables: Dict[str, Dict[str, Any]] = {
             t["tableId"]: dict(t) for t in DEFAULT_INITIAL_TABLES
@@ -205,6 +212,26 @@ class PragmaticFeedService:
         # Callbacks
         self.spin_listeners: List[Callable[[str, Dict[str, Any]], Any]] = []
         self.dealer_listeners: List[Callable[[str, Dict[str, Any]], Any]] = []
+
+    def resolve_table_provider(self, table_id: str, table_name: Optional[str] = None) -> tuple[str, Optional[str]]:
+        """
+        Determines the operator name (e.g. 'Stake', 'Shuffle') and casino ID for a table.
+        If table is exclusive to an operator (Shuffle Roulette, Stake Roulette, Olympus),
+        brands it accordingly. If shared, returns the active feed source.
+        """
+        t_name = (table_name or "").lower()
+        if "shuffle" in t_name or table_id in ("225a117", "226a98", "230a124"):
+            return "Shuffle", "ppcwm00000006838"
+        if "stake" in t_name or "olympus" in t_name or table_id == "2244" or table_id == "236":
+            return "Stake", "ppcds00000003709"
+        if table_id in self.table_provider_map:
+            info = self.table_provider_map[table_id]
+            return info.get("provider", "Pragmatic Live"), info.get("casino_id")
+        
+        # Default to primary active provider in pool (Stake by default)
+        primary_cid = "ppcds00000003709" if ("ppcds00000003709" in self.casino_ids or not self.casino_ids) else ("ppcwm00000006838" if "ppcwm00000006838" in self.casino_ids else next(iter(self.casino_ids), "ppcds00000003709"))
+        pname = self.PROVIDER_NAMES.get(primary_cid, "Stake")
+        return pname, primary_cid
 
     def set_casino_id(self, casino_id: str):
         self.casino_id = casino_id
@@ -231,6 +258,12 @@ class PragmaticFeedService:
         if not self._ws or not keys:
             return
         try:
+            pname = self.PROVIDER_NAMES.get(cid, "Pragmatic Live") if cid else "Pragmatic Live"
+            for k in keys:
+                str_k = str(k)
+                if str_k not in self.table_provider_map or cid == "ppcds00000003709":
+                    self.table_provider_map[str_k] = {"provider": pname, "casino_id": cid}
+
             batch_size = 40
             for i in range(0, len(keys), batch_size):
                 batch = keys[i:i + batch_size]
@@ -244,7 +277,7 @@ class PragmaticFeedService:
                     sub_payload["casinoId"] = cid
                 await self._ws.send(json.dumps(sub_payload))
                 await asyncio.sleep(0.05)
-            logger.info(f"Subscribed {len(keys)} keys with casinoId='{cid}'")
+            logger.info(f"Subscribed {len(keys)} keys with casinoId='{cid}' ({pname})")
         except Exception as ex:
             logger.warning(f"Error subscribing keys for casinoId='{cid}': {ex}")
 
@@ -404,6 +437,9 @@ class PragmaticFeedService:
             else:
                 friendly_name = f"Roulette {table_id}"
 
+        # Resolve provider/operator branding
+        prov_name, prov_cid = self.resolve_table_provider(table_id, friendly_name)
+
         # Initialize or update table record in cache
         if table_id and table_id not in self.available_tables:
             self.available_tables[table_id] = {
@@ -411,12 +447,17 @@ class PragmaticFeedService:
                 "tableName": friendly_name,
                 "tableType": table_type or "ROULETTE",
                 "dealer": None,
+                "provider": prov_name,
+                "casinoId": prov_cid,
                 "lastResults": [],
                 "updatedAt": datetime.now(timezone.utc).isoformat(),
             }
         elif table_id in self.available_tables:
             if friendly_name:
                 self.available_tables[table_id]["tableName"] = friendly_name
+            self.available_tables[table_id]["provider"] = prov_name
+            if prov_cid:
+                self.available_tables[table_id]["casinoId"] = prov_cid
 
 
         table_meta = self.available_tables.get(table_id) if table_id else None
@@ -725,6 +766,7 @@ class PragmaticFeedService:
                         idx_prev = tracker_service.get_wheel_index(prev_pocket, "EUR")
                         offset = tracker_service.calculate_pocket_offset(idx_prev, idx_curr, current_dir, "EUR")
 
+                    prov_name, prov_cid = self.resolve_table_provider(table_id, t_name)
                     entry = TableDealerSpinHistory(
                         game_id=game_id,
                         table_id=table_id,
@@ -736,6 +778,8 @@ class PragmaticFeedService:
                         direction=current_dir,
                         segment_index=tracker_service.get_pocket_segment(p_int, "EUR"),
                         offset_from_previous=offset,
+                        casino_provider=prov_name,
+                        casino_id=prov_cid,
                         spun_at=datetime.now(timezone.utc) - timedelta(minutes=(len(chronological_spins) - idx) * 2),
                     )
                     session.add(entry)
@@ -789,6 +833,7 @@ class PragmaticFeedService:
                             idx_prev = tracker_service.get_wheel_index(prev_pocket, "EUR")
                             offset = tracker_service.calculate_pocket_offset(idx_prev, idx_curr, current_dir, "EUR")
 
+                        prov_name, prov_cid = self.resolve_table_provider(tid, tname)
                         entry = TableDealerSpinHistory(
                             game_id=g_id,
                             table_id=tid,
@@ -800,6 +845,8 @@ class PragmaticFeedService:
                             direction=current_dir,
                             segment_index=tracker_service.get_pocket_segment(p_int, "EUR"),
                             offset_from_previous=offset,
+                            casino_provider=prov_name,
+                            casino_id=prov_cid,
                             spun_at=datetime.now(timezone.utc) - timedelta(minutes=(len(chronological_spins) - idx) * 3),
                         )
                         session.add(entry)
@@ -836,6 +883,7 @@ class PragmaticFeedService:
                 if existing.scalar_one_or_none():
                     return
             
+            prov_name, prov_cid = self.resolve_table_provider(table_id, table_name)
             entry = TableDealerSpinHistory(
                 game_id=game_id,
                 table_id=table_id,
@@ -847,6 +895,8 @@ class PragmaticFeedService:
                 direction=direction,
                 segment_index=segment_index,
                 offset_from_previous=offset_from_previous,
+                casino_provider=prov_name,
+                casino_id=prov_cid,
                 spun_at=datetime.now(timezone.utc),
             )
             session.add(entry)

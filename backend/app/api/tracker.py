@@ -503,18 +503,43 @@ async def get_history_stats(db: AsyncSession = Depends(get_db)):
     )
     dealers = [{"name": row[0], "spins": row[1]} for row in dealer_res.all()]
 
-    # Tables breakdown
+    # Tables breakdown with provider branding
     table_res = await db.execute(
-        select(TableDealerSpinHistory.table_id, TableDealerSpinHistory.table_name, func.count(TableDealerSpinHistory.id))
-        .group_by(TableDealerSpinHistory.table_id, TableDealerSpinHistory.table_name)
+        select(
+            TableDealerSpinHistory.table_id,
+            TableDealerSpinHistory.table_name,
+            TableDealerSpinHistory.casino_provider,
+            func.count(TableDealerSpinHistory.id)
+        )
+        .group_by(
+            TableDealerSpinHistory.table_id,
+            TableDealerSpinHistory.table_name,
+            TableDealerSpinHistory.casino_provider
+        )
         .order_by(func.count(TableDealerSpinHistory.id).desc())
     )
-    tables = [{"id": row[0], "name": row[1] or f"Table {row[0]}", "spins": row[2]} for row in table_res.all()]
+    tables = [
+        {
+            "id": row[0],
+            "name": row[1] or f"Table {row[0]}",
+            "provider": row[2] or "Stake",
+            "spins": row[3]
+        }
+        for row in table_res.all()
+    ]
+
+    # Providers breakdown
+    prov_res = await db.execute(
+        select(TableDealerSpinHistory.casino_provider, func.count(TableDealerSpinHistory.id))
+        .group_by(TableDealerSpinHistory.casino_provider)
+    )
+    providers = [{"name": row[0] or "Stake", "spins": row[1]} for row in prov_res.all()]
 
     return HistoricalArchiveStats(
         total_spins=total_spins,
         dealers=dealers,
         tables=tables,
+        providers=providers,
     )
 
 

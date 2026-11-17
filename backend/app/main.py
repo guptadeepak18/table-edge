@@ -37,6 +37,8 @@ async def lifespan(app: FastAPI):
                 await conn.execute(text("ALTER TABLE subscription_tiers ADD COLUMN IF NOT EXISTS model_type VARCHAR(50) DEFAULT 'subscription';"))
                 await conn.execute(text("ALTER TABLE subscription_tiers ADD COLUMN IF NOT EXISTS description VARCHAR(255);"))
                 await conn.execute(text("ALTER TABLE subscription_tiers ADD COLUMN IF NOT EXISTS badge_text VARCHAR(50);"))
+                await conn.execute(text("ALTER TABLE table_dealer_spin_history ADD COLUMN IF NOT EXISTS casino_provider VARCHAR(50);"))
+                await conn.execute(text("ALTER TABLE table_dealer_spin_history ADD COLUMN IF NOT EXISTS casino_id VARCHAR(100);"))
             except Exception as e:
                 print("Postgres column migration note:", e)
         else:
@@ -64,6 +66,14 @@ async def lifespan(app: FastAPI):
                         cursor.execute("ALTER TABLE subscription_tiers ADD COLUMN description VARCHAR(255)")
                     if "badge_text" not in tcols:
                         cursor.execute("ALTER TABLE subscription_tiers ADD COLUMN badge_text VARCHAR(50)")
+                        
+                    cursor.execute("PRAGMA table_info(table_dealer_spin_history)")
+                    hcols = [c[1] for c in cursor.fetchall()]
+                    if "casino_provider" not in hcols:
+                        cursor.execute("ALTER TABLE table_dealer_spin_history ADD COLUMN casino_provider VARCHAR(50)")
+                    if "casino_id" not in hcols:
+                        cursor.execute("ALTER TABLE table_dealer_spin_history ADD COLUMN casino_id VARCHAR(100)")
+                        
                     connection.connection.commit()
                 except Exception as e:
                     print("SQLite schema migration note:", e)
