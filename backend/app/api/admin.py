@@ -10,6 +10,7 @@ from app.models.user import User, Subscription, SubscriptionTier, TierConfig, Ti
 from app.models.tracker import CasinoConfig
 from app.schemas.tracker import CasinoConfigCreate, CasinoConfigUpdate, CasinoConfigResponse
 from app.core.security import hash_password, get_current_admin
+from app.services.pragmatic_feed import pragmatic_feed_service
 
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -556,6 +557,8 @@ async def create_casino_config(
     db.add(new_casino)
     await db.commit()
     await db.refresh(new_casino)
+    if new_casino.is_active:
+        pragmatic_feed_service.add_casino_id(new_casino.casino_id)
     return CasinoConfigResponse(
         id=new_casino.id,
         name=new_casino.name,
@@ -599,6 +602,8 @@ async def update_casino_config(
 
     await db.commit()
     await db.refresh(casino)
+    if casino.is_active:
+        pragmatic_feed_service.add_casino_id(casino.casino_id)
     return CasinoConfigResponse(
         id=casino.id,
         name=casino.name,

@@ -1,3 +1,5 @@
+import uuid
+from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
@@ -13,6 +15,7 @@ from app.schemas.tracker import (
     LiveFeedStartRequest,
     LiveFeedBindRequest,
     CasinoConfigResponse,
+    CasinoConfigCreate,
     HistoricalArchiveStats,
 )
 from app.services.tracker_service import tracker_service
@@ -289,11 +292,68 @@ async def get_live_feed_status():
     return {
         "running": pragmatic_feed_service._running,
         "casino_id": pragmatic_feed_service.casino_id,
+        "active_casino_ids": list(pragmatic_feed_service.casino_ids),
         "currency": pragmatic_feed_service.currency,
         "subscribed_keys": list(pragmatic_feed_service.subscribed_keys),
         "tables_discovered": len(pragmatic_feed_service.available_tables),
         "bound_tables": pragmatic_feed_service.active_table_session_map,
     }
+
+@router.post("/casinos/register", response_model=CasinoConfigResponse)
+async def register_casino_id(
+    payload: CasinoConfigCreate,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Registers a new Casino ID into the system pool and activates it
+    in the live Pragmatic feed service dynamically for maximum table coverage.
+    """
+    cid = payload.casino_id.strip()
+    if payload.is_default:
+        all_res = await db.execute(select(CasinoConfig))
+        for existing_c in all_res.scalars().all():
+            existing_c.is_default = False
+
+    res = await db.execute(select(CasinoConfig).where(CasinoConfig.casino_id == cid))
+    existing = res.scalar_one_or_none()
+    if existing:
+        existing.is_active = payload.is_active
+        existing.name = payload.name or existing.name
+        existing.notes = payload.notes or existing.notes
+        if payload.is_default:
+            existing.is_default = True
+        await db.commit()
+        await db.refresh(existing)
+        target = existing
+    else:
+        new_casino = CasinoConfig(
+            id=str(uuid.uuid4()),
+            name=payload.name or f"Pragmatic Operator ({cid})",
+            casino_id=cid,
+            provider=payload.provider or "pragmatic",
+            is_default=payload.is_default,
+            is_active=payload.is_active,
+            notes=payload.notes or "Added to ingestion pool",
+            created_at=datetime.now(timezone.utc),
+        )
+        db.add(new_casino)
+        await db.commit()
+        await db.refresh(new_casino)
+        target = new_casino
+
+    if target.is_active:
+        pragmatic_feed_service.add_casino_id(target.casino_id)
+
+    return CasinoConfigResponse(
+        id=target.id,
+        name=target.name,
+        casino_id=target.casino_id,
+        provider=target.provider or "pragmatic",
+        is_default=bool(target.is_default),
+        is_active=bool(target.is_active),
+        notes=target.notes,
+        created_at=target.created_at.isoformat() if target.created_at else datetime.now(timezone.utc).isoformat(),
+    )
 
 @router.get("/live-feed/tables")
 async def get_live_feed_tables():

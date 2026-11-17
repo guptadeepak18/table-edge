@@ -182,6 +182,9 @@ class PragmaticFeedService:
     ):
         self.ws_url = ws_url
         self.casino_id = casino_id
+        self.casino_ids: Set[str] = set()
+        if casino_id:
+            self.casino_ids.add(casino_id)
         self.currency = currency
         self._running = False
         self._task: Optional[asyncio.Task] = None
@@ -203,6 +206,45 @@ class PragmaticFeedService:
 
     def set_casino_id(self, casino_id: str):
         self.casino_id = casino_id
+        if casino_id:
+            self.casino_ids.add(casino_id.strip())
+
+    def add_casino_id(self, casino_id: str):
+        """Adds a casino ID to the active ingestion pool and subscribes immediately if connected."""
+        if not casino_id:
+            return
+        cid = casino_id.strip()
+        if not cid:
+            return
+        is_new = cid not in self.casino_ids
+        self.casino_ids.add(cid)
+        self.casino_id = cid
+        logger.info(f"[CASINO POOL] Added casino ID '{cid}'. Active pool: {list(self.casino_ids)}")
+        if is_new and self._ws and self._running:
+            keys_to_sub = list(self.subscribed_keys) if self.subscribed_keys else list(self.available_tables.keys())
+            asyncio.create_task(self._subscribe_single_casino(cid, keys_to_sub))
+
+    async def _subscribe_single_casino(self, cid: Optional[str], keys: List[str]):
+        """Helper to send subscription frames for a specific casino ID."""
+        if not self._ws or not keys:
+            return
+        try:
+            batch_size = 40
+            for i in range(0, len(keys), batch_size):
+                batch = keys[i:i + batch_size]
+                sub_payload: Dict[str, Any] = {
+                    "type": "subscribe",
+                    "isDeltaEnabled": True,
+                    "key": batch,
+                    "currency": self.currency,
+                }
+                if cid:
+                    sub_payload["casinoId"] = cid
+                await self._ws.send(json.dumps(sub_payload))
+                await asyncio.sleep(0.05)
+            logger.info(f"Subscribed {len(keys)} keys with casinoId='{cid}'")
+        except Exception as ex:
+            logger.warning(f"Error subscribing keys for casinoId='{cid}': {ex}")
 
     def bind_table_to_session(self, table_id: str, session_id: str):
         """Binds a Pragmatic tableId (e.g. '206') strictly 1:1 to a TableEdge LiveTrackingSession id."""
@@ -277,21 +319,14 @@ class PragmaticFeedService:
                 async with connect(self.ws_url, additional_headers=headers) as ws:
                     self._ws = ws
                     retry_delay = 2
-                    logger.info("Connected to Pragmatic DGA. Sending subscription...")
+                    logger.info("Connected to Pragmatic DGA. Sending multi-casino subscriptions...")
 
-                    # Send subscription message for all known tables
+                    # Send subscription message across all casino IDs in pool
                     keys_to_subscribe = list(self.subscribed_keys) if self.subscribed_keys else list(self.available_tables.keys())
-                    sub_payload: Dict[str, Any] = {
-                        "type": "subscribe",
-                        "isDeltaEnabled": True,
-                        "key": keys_to_subscribe,
-                        "currency": self.currency,
-                    }
-                    if self.casino_id:
-                        sub_payload["casinoId"] = self.casino_id
-
-                    await ws.send(json.dumps(sub_payload))
-                    logger.info(f"Subscribed to keys: {keys_to_subscribe}")
+                    cids = list(self.casino_ids) if self.casino_ids else ([self.casino_id] if self.casino_id else [None])
+                    logger.info(f"Subscribing {len(keys_to_subscribe)} keys across {len(cids)} casino IDs in pool: {cids}")
+                    for cid in cids:
+                        await self._subscribe_single_casino(cid, keys_to_subscribe)
 
                     # Read stream frames
                     async for raw_message in ws:
@@ -345,19 +380,10 @@ class PragmaticFeedService:
                     new_keys.append(str_k)
                     self.subscribed_keys.add(str_k)
             if new_keys and self._ws:
-                try:
-                    sub_more = {
-                        "type": "subscribe",
-                        "isDeltaEnabled": True,
-                        "key": new_keys,
-                        "currency": self.currency,
-                    }
-                    if self.casino_id:
-                        sub_more["casinoId"] = self.casino_id
-                    asyncio.create_task(self._ws.send(json.dumps(sub_more)))
-                    logger.info(f"Auto-subscribed to {len(new_keys)} newly discovered table keys: {new_keys}")
-                except Exception as ex:
-                    logger.warning(f"Failed to auto-subscribe new keys: {ex}")
+                cids = list(self.casino_ids) if self.casino_ids else ([self.casino_id] if self.casino_id else [None])
+                for cid in cids:
+                    asyncio.create_task(self._subscribe_single_casino(cid, new_keys))
+                logger.info(f"Auto-subscribed {len(new_keys)} newly discovered table keys across pool: {new_keys}")
             return
 
         table_id = str(item.get("tableId") or item.get("id") or "")

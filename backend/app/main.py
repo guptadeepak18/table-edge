@@ -207,51 +207,58 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             print("Custom condition options seeding note:", e)
 
-        # Seed default Casino Configuration if not present
+        # Seed default & configured Casino Operators if not present
         try:
             from app.models.tracker import CasinoConfig
             casino_res = await session.execute(select(CasinoConfig))
             existing_casinos = casino_res.scalars().all()
-            if not existing_casinos:
-                default_casino = CasinoConfig(
-                    id=str(uuid.uuid4()),
-                    name="Pragmatic Play Live (Default)",
-                    casino_id="ppcdk00000003716",
-                    provider="pragmatic",
-                    is_default=True,
-                    is_active=True,
-                    notes="System default Pragmatic Play DGA live casino operator ID.",
-                    created_at=datetime.now(timezone.utc)
-                )
-                session.add(default_casino)
-                await session.commit()
-                print(f"[CASINO SEED] Seeded default casino operator: {default_casino.casino_id}")
-            else:
-                # Ensure ppcdk00000003716 exists
-                has_default = any(c.casino_id == "ppcdk00000003716" for c in existing_casinos)
-                if not has_default:
-                    default_casino = CasinoConfig(
+            
+            # Initial multi-casino operator pool
+            initial_casinos = [
+                ("ppcwm00000006838", "Pragmatic Play Live (Primary - 44+ tables)", True),
+                ("ppcdk00000003716", "Pragmatic Play Live (Secondary - Legacy)", False),
+            ]
+            
+            for cid, cname, is_def in initial_casinos:
+                match = next((c for c in existing_casinos if c.casino_id == cid), None)
+                if not match:
+                    new_casino = CasinoConfig(
                         id=str(uuid.uuid4()),
-                        name="Pragmatic Play Live (Default)",
-                        casino_id="ppcdk00000003716",
+                        name=cname,
+                        casino_id=cid,
                         provider="pragmatic",
-                        is_default=True,
+                        is_default=is_def,
                         is_active=True,
-                        notes="System default Pragmatic Play DGA live casino operator ID.",
+                        notes=f"Configured Pragmatic Play DGA operator ID: {cid}",
                         created_at=datetime.now(timezone.utc)
                     )
-                    session.add(default_casino)
-                    await session.commit()
-                    print(f"[CASINO SEED] Seeded missing default casino operator: {default_casino.casino_id}")
+                    session.add(new_casino)
+                    print(f"[CASINO SEED] Added casino operator to pool: {cid} ({cname})")
+                elif is_def and not match.is_default:
+                    match.is_default = True
+            
+            await session.commit()
         except Exception as e:
             print("Casino config seeding note:", e)
 
-        # Autonomous 24/7 Pragmatic Live Feed Ingestion
+        # Autonomous 24/7 Pragmatic Live Feed Ingestion across all active Casino IDs
         try:
             from app.services.pragmatic_feed import pragmatic_feed_service
-            pragmatic_feed_service.set_casino_id("ppcdk00000003716")
+            
+            # Load all active casino IDs from DB into the ingestion pool
+            active_casinos_res = await session.execute(
+                select(CasinoConfig.casino_id).where(CasinoConfig.is_active == True)
+            )
+            active_ids = [row[0] for row in active_casinos_res.all() if row[0]]
+            for cid in active_ids:
+                pragmatic_feed_service.add_casino_id(cid)
+                
+            # If no DB records yet, ensure default primary is set
+            if not active_ids:
+                pragmatic_feed_service.add_casino_id("ppcwm00000006838")
+                
             await pragmatic_feed_service.start()
-            print("[FEED AUTOSTART] Autonomous Pragmatic live feed service started on server launch.")
+            print(f"[FEED AUTOSTART] Autonomous Pragmatic live feed service started with casino pool: {list(pragmatic_feed_service.casino_ids)}")
         except Exception as e:
             print("Failed to auto-start Pragmatic feed service:", e)
 
